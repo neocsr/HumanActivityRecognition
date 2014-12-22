@@ -26,7 +26,7 @@ The Machine Learning technique selected was *Random Forest* and it could achieve
 
 Using the _Caret_ package and loading the data:
 
-```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE}
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE, warning = FALSE}
 library(caret)
 set.seed(666)
 
@@ -35,15 +35,15 @@ weightLiftingData <- read.csv("pml-training.csv", stringsAsFactors = TRUE)
 
 After examinating the _weightLiftingData_ in the R workspace, I discarded several columns that had *NA* or empty values and the ones that didn't seem to add any additional value.
 
-I saved the remaining 52 valid columns in a file _valid_column_names.csv_:
+I saved the remaining 52 valid columns in a file *valid_column_names.csv*:
 
-```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE}
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE, warning = FALSE}
 columnNames <- read.csv("valid_column_names.csv", stringsAsFactors = FALSE)[[1]]
 ```
 
 Then using only those columns I generated the training and testing sets:
 
-```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE}
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE, warning = FALSE}
 wl <- weightLiftingData[, columnNames]
 
 inTrain <- createDataPartition(wl$classe, p = 0.75, list = FALSE)
@@ -53,7 +53,7 @@ testing <- wl[-inTrain, ]
 
 And execute the training algorithm using _Random Forests_ with a parallel processing setup using 2 cpu cores:
 
-```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE}
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE, warning = FALSE}
 library(doMC)
 registerDoMC(cores = 2)
 
@@ -63,25 +63,24 @@ fit <- train(classe ~ ., data = training, method = "rf", trControl = tc, prox = 
 duration <- proc.time() - startTime
 ```
 
-The training process took `r duration`
+The training process took
+
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE, warning = FALSE}
+duration
+```
 
 The evaluation of the _testing_ data and confusion matrix:
 
-```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE}
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE, warning = FALSE}
 prediction <- predict(fit, newdata = testing)
 confusionMatrix(testing$classe, prediction)
 ```
 
 With this model and the test cases I can solve the second question:
 
-```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE}
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE, warning = FALSE}
 testCasesData <- read.csv("pml-testing.csv", stringsAsFactors = TRUE)
 testCases <- testCasesData[, columnNames[-52]]
 predict(fit, testCases)
 ```
-
-
-
-
-
 

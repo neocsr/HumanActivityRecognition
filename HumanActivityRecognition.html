@@ -96,10 +96,12 @@ registerDoMC(cores = 2)
 
 tc &lt;- trainControl(method = &quot;cv&quot;, number = 3, allowParallel = TRUE)
 startTime &lt;- proc.time()
-fit &lt;- train(classe ~ ., data = training, method = &quot;rf&quot;, trControl = tc, prox = FALSE)</code></pre>
-<pre><code>## Warning: package 'randomForest' was built under R version 3.1.1</code></pre>
-<pre class="r"><code>duration &lt;- proc.time() - startTime</code></pre>
-<p>The training process took 73.039, 1.297, 349.012, 474.118, 12.13</p>
+fit &lt;- train(classe ~ ., data = training, method = &quot;rf&quot;, trControl = tc, prox = FALSE)
+duration &lt;- proc.time() - startTime</code></pre>
+<p>The training process took</p>
+<pre class="r"><code>duration</code></pre>
+<pre><code>##    user  system elapsed 
+##  581.38   18.05  383.00</code></pre>
 <p>The evaluation of the <em>testing</em> data and confusion matrix:</p>
 <pre class="r"><code>prediction &lt;- predict(fit, newdata = testing)
 confusionMatrix(testing$classe, prediction)</code></pre>
@@ -107,9 +109,9 @@ confusionMatrix(testing$classe, prediction)</code></pre>
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 1394    1    0    0    0
+##          A 1393    2    0    0    0
 ##          B    7  942    0    0    0
-##          C    0    3  849    3    0
+##          C    0    2  850    3    0
 ##          D    0    0    4  799    1
 ##          E    0    0    0    3  898
 ## 
@@ -117,7 +119,7 @@ confusionMatrix(testing$classe, prediction)</code></pre>
 ##                                         
 ##                Accuracy : 0.996         
 ##                  95% CI : (0.993, 0.997)
-##     No Information Rate : 0.286         
+##     No Information Rate : 0.285         
 ##     P-Value [Acc &gt; NIR] : &lt;2e-16        
 ##                                         
 ##                   Kappa : 0.994         
@@ -127,10 +129,10 @@ confusionMatrix(testing$classe, prediction)</code></pre>
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
 ## Sensitivity             0.995    0.996    0.995    0.993    0.999
-## Specificity             1.000    0.998    0.999    0.999    0.999
-## Pos Pred Value          0.999    0.993    0.993    0.994    0.997
+## Specificity             0.999    0.998    0.999    0.999    0.999
+## Pos Pred Value          0.999    0.993    0.994    0.994    0.997
 ## Neg Pred Value          0.998    0.999    0.999    0.999    1.000
-## Prevalence              0.286    0.193    0.174    0.164    0.183
+## Prevalence              0.285    0.193    0.174    0.164    0.183
 ## Detection Rate          0.284    0.192    0.173    0.163    0.183
 ## Detection Prevalence    0.284    0.194    0.174    0.164    0.184
 ## Balanced Accuracy       0.997    0.997    0.997    0.996    0.999</code></pre>
