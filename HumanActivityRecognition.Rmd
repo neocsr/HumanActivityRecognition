@@ -1,0 +1,87 @@
+---
+title: "Human Activity Recognition"
+author: "Christian Sousa"
+date: "December 21, 2014"
+output: html_document
+---
+
+# Summary
+
+The present analysis is based on the _Weight Lifting Exercises Dataset_ obtained from [Ugulino et al](http://groupware.les.inf.puc-rio.br/har) in their research about _Human Activity Recognition_.
+
+The data was collected using several sensors in different parts of the body.
+There is a _classe_ column that labels the exercise.
+
+It could be one of the following 5 factors:
+
+- *Class A*: exactly according to the specification
+- *Class B*: throwing the elbows to the front
+- *Class C*: lifting the dumbbell only halfway
+- *Class D*: lowering the dumbbell only halfway
+- *Class E*: throwing the hips to the front
+
+The Machine Learning technique selected was *Random Forest* and it could achieve *99.55%* accuracy with a training set consisting of *75%* of the samples.
+
+# Processing
+
+Using the _Caret_ package and loading the data:
+
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE}
+library(caret)
+set.seed(666)
+
+weightLiftingData <- read.csv("pml-training.csv", stringsAsFactors = TRUE)
+```
+
+After examinating the _weightLiftingData_ in the R workspace, I discarded several columns that had *NA* or empty values and the ones that didn't seem to add any additional value.
+
+I saved the remaining 52 valid columns in a file _valid_column_names.csv_:
+
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE}
+columnNames <- read.csv("valid_column_names.csv", stringsAsFactors = FALSE)[[1]]
+```
+
+Then using only those columns I generated the training and testing sets:
+
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE}
+wl <- weightLiftingData[, columnNames]
+
+inTrain <- createDataPartition(wl$classe, p = 0.75, list = FALSE)
+training <- wl[inTrain, ]
+testing <- wl[-inTrain, ]
+```
+
+And execute the training algorithm using _Random Forests_ with a parallel processing setup using 2 cpu cores:
+
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE}
+library(doMC)
+registerDoMC(cores = 2)
+
+tc <- trainControl(method = "cv", number = 3, allowParallel = TRUE)
+startTime <- proc.time()
+fit <- train(classe ~ ., data = training, method = "rf", trControl = tc, prox = FALSE)
+duration <- proc.time() - startTime
+```
+
+The training process took `r duration`
+
+The evaluation of the _testing_ data and confusion matrix:
+
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE}
+prediction <- predict(fit, newdata = testing)
+confusionMatrix(testing$classe, prediction)
+```
+
+With this model and the test cases I can solve the second question:
+
+```{r, echo = TRUE, cache = TRUE, errors = FALSE, message = FALSE}
+testCasesData <- read.csv("pml-testing.csv", stringsAsFactors = TRUE)
+testCases <- testCasesData[, columnNames[-52]]
+predict(fit, testCases)
+```
+
+
+
+
+
+
